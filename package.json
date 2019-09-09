@@ -1,0 +1,27 @@
+{
+  "name": "whos-in",
+  "version": "1.0.0",
+  "description": "Telegram notification of who accesses and leaves the Minecraft bedrock server alpha",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SemteulGaram/WhosIn.git"
+  },
+  "author": "SemteulGaram",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SemteulGaram/WhosIn/issues"
+  },
+  "homepage": "https://github.com/SemteulGaram/WhosIn#readme",
+  "devDependencies": {
+    "@types/node": "^12.6.9",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "telegraf": "^3.32.0"
+  }
+}
