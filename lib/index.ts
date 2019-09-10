@@ -45,11 +45,12 @@ class WhosIn {
     // One-way chat sync (Telegram -> Server using /say command)
     if (config.get('telegramChatToServer')) {
       this._botTelegraf.on('text', (ctx: ContextMessageUpdate) => {
-        if (!ctx.chat || !ctx.from) return;
+        if (!ctx.chat || !ctx.message || !ctx.message.from) return;
         if (ctx.chat.id === this._telegramBotChatroomId) {
           // Build message
-          const fullname = ctx.from.first_name + ctx.from.last_name ? ' ' + ctx.from.last_name : '';
-          const message = ('' + ctx.message).replace('\n', ' ');
+          const fullname = ctx.message.from.first_name + ctx.message.from.last_name
+            ? ' ' + ctx.message.from.last_name : '';
+          const message = ('' + ctx.message.text).replace('\n', ' ');
           this._sendMessage(this._telegramChatFormat.replace('{0}', fullname).replace('{1}', message));
         }
       });
@@ -83,10 +84,6 @@ class WhosIn {
       this._server = childProcess.spawn(serverExe, {
         cwd: serverPath
       });
-      // TODO: test code
-      //this._server = childProcess.spawn('node', [path.resolve('./test/test-server.js')], {
-      //  cwd: path.resolve('.')
-      //});
     } else {
       // OS logging
       cOs = 'linux';
