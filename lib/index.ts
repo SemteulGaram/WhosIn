@@ -48,8 +48,8 @@ class WhosIn {
         if (!ctx.chat || !ctx.message || !ctx.message.from) return;
         if (ctx.chat.id === this._telegramBotChatroomId) {
           // Build message
-          const fullname = ctx.message.from.first_name + ctx.message.from.last_name
-            ? ' ' + ctx.message.from.last_name : '';
+          const fullname = ctx.message.from.first_name
+            + (ctx.message.from.last_name ? ' ' + ctx.message.from.last_name : '');
           const message = ('' + ctx.message.text).replace('\n', ' ');
           this._sendMessage(this._telegramChatFormat.replace('{0}', fullname).replace('{1}', message));
         }
