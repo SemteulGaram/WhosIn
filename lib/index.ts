@@ -10,12 +10,16 @@ import logger from './logger';
 class WhosIn {
   // Internal mc server stdout buffer
   private _internalBuffer: string;
+  // Import from config
+  private _telegramBotChatroomId: number;
+  private _telegramChatFormat: string;
   // Global bot telegraf instance
   private _botTelegraf: Telegraf<ContextMessageUpdate>;
   // Global bot telegram instance
   private _botTelegram: Telegram;
   // Official minecraft bedrock server alpha process
   private _server: ChildProcessWithoutNullStreams|null;
+  
 
   constructor () {
     logger.info('WhosIn instance initialize...');
@@ -26,6 +30,8 @@ class WhosIn {
     if (!config.ready) {
       throw new Error('Config not initialized!');
     }
+    this._telegramBotChatroomId = parseInt(config.get('telegramBotChatroomId'));
+    this._telegramChatFormat = config.get('telegramChatFormat');
 
     // Telegram bot initialize
     this._botTelegraf = new Telegraf(config.get('telegramBotToken'));
@@ -36,6 +42,18 @@ class WhosIn {
         ctx.reply('Unknown id chatroom :/');
       }
     });
+    // One-way chat sync (Telegram -> Server using /say command)
+    if (config.get('telegramChatToServer')) {
+      this._botTelegraf.on('text', (ctx: ContextMessageUpdate) => {
+        if (!ctx.chat || !ctx.from) return;
+        if (ctx.chat.id === this._telegramBotChatroomId) {
+          // Build message
+          const fullname = ctx.from.first_name + ctx.from.last_name ? ' ' + ctx.from.last_name : '';
+          const message = ('' + ctx.message).replace('\n', ' ');
+          this._sendMessage(this._telegramChatFormat.replace('{0}', fullname).replace('{1}', message));
+        }
+      });
+    }
     this._botTelegraf.launch();
     this._botTelegram = this._botTelegraf.telegram;
 
@@ -107,6 +125,13 @@ class WhosIn {
     });
   }
 
+  // Send chat to server
+  private _sendMessage (text: string): void {
+    if (!this._server) return;
+    this._server.stdin.write('/say ' + text + '\n');
+  }
+
+  // Server stdout update callback
   private _bufferUpdate (): void {
     if (!this._server) return;
 
@@ -116,18 +141,18 @@ class WhosIn {
       let target = null;
       if (lines[i].match(/^\[.* INFO\] Server started\.\r?$/)) {
         logger.info('Server start detect!');
-        //this._botTelegram.sendMessage(config.get('telegramBotChatroomId'),
-        //  config.get('serverStartMessage'));
+        this._botTelegram.sendMessage(config.get('telegramBotChatroomId'),
+          config.get('serverStartMessage'));
       } else if ((target = lines[i]
         .match(/^\[.* INFO\] Player connected: (.+), xuid: \d+\r?$/))) {
 
-        //this._botTelegram.sendMessage(config.get('telegramBotChatroomId'),
-        //  config.get('joinMessage').replace('{0}', target[1]));
+        this._botTelegram.sendMessage(config.get('telegramBotChatroomId'),
+          config.get('joinMessage').replace('{0}', target[1]));
       } else if ((target = lines[i]
         .match(/^\[.* INFO\] Player disconnected: (.+), xuid: \d+\r?$/))) {
 
-        //this._botTelegram.sendMessage(config.get('telegramBotChatroomId'),
-        //  config.get('leaveMessage').replace('{0}', target[1]));
+        this._botTelegram.sendMessage(config.get('telegramBotChatroomId'),
+          config.get('leaveMessage').replace('{0}', target[1]));
       }
     }
     this._internalBuffer = lines[lines.length - 1];

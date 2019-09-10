@@ -44,19 +44,23 @@ Config.DEFAULT_CONFIG = `{
   "serverPath": "../mcb",
   "telegramBotToken": "[YOUR_TELEGRAM_BOT_TOKEN]",
   "telegramBotChatroomId": "[YOUR_TELEGRAM_CHATROOM_ID (Send this bot a command from the corresponding chat room: /getChatroomId@[BOTNAME])]",
+  "telegramChatToServer": false,
   "serverStartMessage": "Minecraft server started!",
   "joinMessage": "{0} join server.",
-  "leaveMessage": "{0} leave server."
+  "leaveMessage": "{0} leave server.",
+  "telegramChatFormat": "<{0}> {1}"
 }`;
 
 export interface IConfig {
   osDetect: string;
-  serverPath: string,
-  telegramBotToken: string,
-  telegramBotChatroomId: string,
+  serverPath: string;
+  telegramBotToken: string;
+  telegramBotChatroomId: string;
+  telegramChatToServer: boolean;
   serverStartMessage: string;
-  joinMessage: string,
-  leaveMessage: string
+  joinMessage: string;
+  leaveMessage: string;
+  telegramChatFormat: string;
 }
 
 export const instance = new Config('./config.json');
