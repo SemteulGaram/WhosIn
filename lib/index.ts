@@ -128,7 +128,7 @@ class WhosIn {
   // Send chat to server
   private _sendMessage (text: string): void {
     if (!this._server) return;
-    this._server.stdin.write('/say ' + text + '\n');
+    this._server.stdin.write('say ' + text + '\n');
   }
 
   // Server stdout update callback

@@ -1,6 +1,6 @@
 {
   "name": "whos-in",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Telegram notification of who accesses and leaves the Minecraft bedrock server alpha",
   "main": "index.js",
   "scripts": {
